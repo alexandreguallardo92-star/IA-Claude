@@ -5,35 +5,43 @@ description: Prépare les vidéos TikTok du jour pour le compte « abondance pos
 
 # TikTok « abondance positive »
 
-Objectif actuel : **atteindre 10 000 abonnés** (condition du programme de rémunération TikTok),
-avec **3 vidéos par jour de 10 secondes maximum**. Étape suivante (plus tard) : vidéos de plus
+Objectif actuel : **atteindre 10 000 abonnés** (condition du programme de rémunération TikTok)
+sur **3 comptes**, avec **au moins 3 vidéos par jour et par compte** (9 vidéos par jour),
+**10 secondes maximum**, et **toutes différentes**. Étape suivante (plus tard) : vidéos de plus
 d'une minute pour être rémunéré.
 
 ## Dossiers (à la racine du repo)
 
 - `tiktok/videos_sources/` — longues vidéos de nature fournies par l'utilisateur
 - `tiktok/musique/` — musiques fournies par l'utilisateur (mp3, m4a, wav…)
-- `tiktok/a_publier/AAAA-MM-JJ/` — résultat : `video_N.mp4` + `video_N_legende.txt`
-- `tiktok/historique.json` — tout ce qui a déjà été publié (textes, rush, moment coupé)
+- `tiktok/comptes.json` — les comptes : nom, nombre de vidéos par jour, styles, thèmes,
+  mots à commenter, légende et hashtags propres à chacun
+- `tiktok/a_publier/AAAA-MM-JJ/<compte>/` — résultat : `video_N.mp4` + `video_N_legende.txt`
+- `tiktok/historique.json` — tout ce qui a déjà été publié, tous comptes confondus
+  (compte, textes, rush, moment coupé)
 
 ## Déroulé
 
 1. **Vérifier** qu'il y a au moins une vidéo dans `tiktok/videos_sources/`. Sinon, s'arrêter et
    demander à l'utilisateur d'en déposer. S'il n'y a pas de musique, prévenir mais continuer.
-2. **Lire `tiktok/historique.json`** (s'il existe) pour ne jamais répéter un texte déjà utilisé
-   et varier par rapport aux derniers jours (accroche, couleurs, mot à commenter).
-3. **Écrire les 3 vidéos du jour** dans un fichier JSON temporaire (voir format et règles plus bas).
-4. **Lancer le montage** depuis la racine du repo :
+2. **Lire `tiktok/comptes.json`** et **`tiktok/historique.json`** (s'il existe). Aucun texte ne
+   doit être répété, ni sur le même compte, ni d'un compte à l'autre.
+3. **Pour chaque compte**, écrire ses `videos_par_jour` vidéos dans un fichier JSON temporaire
+   (format et règles plus bas) en respectant **son identité** : ses styles, ses thèmes, ses mots à
+   commenter, sa légende et ses hashtags. Les comptes ne doivent pas se ressembler entre eux.
+4. **Lancer le montage** pour chaque compte, depuis la racine du repo :
    ```
-   python .claude/skills/tiktok-abondance/scripts/generer.py <fichier.json>
+   python .claude/skills/tiktok-abondance/scripts/generer.py <fichier.json> --compte <nom>
    ```
-   Le script choisit un rush au hasard, le coupe à un moment au hasard (10 s), le recadre en
-   1080×1920, pose les blocs de texte, ajoute une musique au hasard (départ au hasard, fondus)
-   et met à jour l'historique.
+   Le script choisit un rush au hasard, le coupe à un moment au hasard (10 s) qui n'a jamais
+   servi (aucun compte ne réutilise les mêmes images), le recadre en 1080×1920, pose les blocs
+   de texte, ajoute une musique au hasard (départ au hasard, fondus) et met à jour l'historique.
 5. **Contrôler** une image de chaque vidéo (`ffmpeg -ss 3 -i video_N.mp4 -frames:v 1 apercu.png`)
    : texte lisible, rien de coupé. Supprimer l'aperçu ensuite.
-6. **Résumer** à l'utilisateur : chemin du dossier, les 3 textes, les 3 légendes à copier.
-   Rappeler les heures conseillées : ~12h, ~18h, ~21h.
+6. **Résumer** à l'utilisateur, compte par compte : chemin du dossier, les textes, les légendes
+   à copier. Rappeler les heures conseillées : ~12h, ~18h, ~21h, en décalant d'environ
+   15 minutes d'un compte à l'autre. Si le script a prévenu que les rushs s'épuisent,
+   le dire clairement.
 
 ## Format du JSON
 

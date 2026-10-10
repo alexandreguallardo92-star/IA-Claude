@@ -1,0 +1,35 @@
+[
+  {
+    "nom": "compte1",
+    "videos_par_jour": 3,
+    "styles_titre": ["titre_rouge", "titre_vert"],
+    "styles_corps": ["corps_bleu", "corps_blanc"],
+    "styles_appel": ["appel_vert"],
+    "themes": ["argent", "richesse", "chance"],
+    "mots_a_commenter": ["argent", "je reçois", "merci"],
+    "legende": "abonne-toi pour recevoir l'abondance 🔮",
+    "hashtags": ["#abondance", "#abondancepositive", "#argent", "#loidelattraction", "#pourtoi"]
+  },
+  {
+    "nom": "compte2",
+    "videos_par_jour": 3,
+    "styles_titre": ["titre_violet"],
+    "styles_corps": ["contour"],
+    "styles_appel": ["appel_jaune"],
+    "themes": ["message de l'univers", "bonne nouvelle", "signe"],
+    "mots_a_commenter": ["je veux", "oui", "c'est pour moi"],
+    "legende": "abonne-toi, l'univers a un message pour toi ✨",
+    "hashtags": ["#univers", "#manifestation", "#spiritualité", "#messagedelunivers", "#pourtoi"]
+  },
+  {
+    "nom": "compte3",
+    "videos_par_jour": 3,
+    "styles_titre": ["titre_vert", "titre_rouge"],
+    "styles_corps": ["corps_blanc"],
+    "styles_appel": ["appel_vert", "appel_jaune"],
+    "themes": ["chance", "amour", "santé", "famille", "travail"],
+    "mots_a_commenter": ["amen", "merci", "abondance"],
+    "legende": "abonne-toi pour attirer la chance 🍀",
+    "hashtags": ["#chance", "#affirmationpositive", "#gratitude", "#abondance", "#pourtoi"]
+  }
+]

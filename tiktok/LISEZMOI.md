@@ -29,6 +29,16 @@ git pull
 
 Ces fichiers restent sur ton PC (ils ne sont pas envoyés sur GitHub).
 
+Chaque vidéo utilise un passage de 10 s jamais montré, tous comptes confondus. À 9 vidéos par
+jour, **1 heure de vidéo nature dure environ 40 jours**. Le skill te prévient quand il faut en
+rajouter.
+
+## Tes 3 comptes
+
+Ouvre `tiktok/comptes.json` et remplace `compte1`, `compte2`, `compte3` par les vrais noms de
+tes comptes. Chaque compte a son propre style (couleurs, thèmes, mots à commenter, hashtags)
+pour qu'ils ne se ressemblent pas. Tu peux aussi changer `videos_par_jour`.
+
 ## 3. Générer les vidéos du jour
 
 Dans Claude Code, ouvert dans le dossier du repo, tape :
@@ -37,7 +47,8 @@ Dans Claude Code, ouvert dans le dossier du repo, tape :
 /tiktok-abondance
 ```
 
-Les 3 vidéos et leurs légendes arrivent dans `tiktok/a_publier/<date du jour>/`.
+Les vidéos et leurs légendes arrivent dans `tiktok/a_publier/<date du jour>/<compte>/`
+(3 par compte, donc 9 au total).
 
 ## 4. Automatique chaque matin
 
@@ -51,5 +62,5 @@ Démarrer un programme :
 
 ## 5. Publier
 
-Envoie les vidéos sur ton téléphone (Google Drive, câble, etc.) et publie-les vers 12h, 18h et 21h
+Envoie les vidéos sur ton téléphone (Google Drive, câble, etc.) et publie-les vers 12h, 18h et 21h (décale d'environ 15 min d'un compte à l'autre),
 en copiant la légende de `video_N_legende.txt`.

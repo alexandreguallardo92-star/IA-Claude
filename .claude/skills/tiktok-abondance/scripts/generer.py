@@ -151,9 +151,23 @@ def rendre_calque(blocs, chemin):
     calque.save(chemin)
 
 
-def generer_video(source, musique, calque, sortie, duree_clip):
-    d_src = duree(source)
-    debut = random.uniform(0, max(0.0, d_src - duree_clip))
+def choisir_passage(sources, historique, duree_clip):
+    """Prend un rush et un moment au hasard qui ne recoupe aucun passage déjà utilisé,
+    tous comptes confondus : deux vidéos ne montrent jamais les mêmes images."""
+    deja = {}
+    for h in historique:
+        deja.setdefault(h["source"], []).append(h["debut_source"])
+    for _ in range(200):
+        source = random.choice(sources)
+        d_src = duree(source)
+        debut = random.uniform(0, max(0.0, d_src - duree_clip))
+        if all(abs(debut - d) >= duree_clip for d in deja.get(os.path.basename(source), [])):
+            return source, debut
+    print("⚠ Rushs presque épuisés : ajoute de nouvelles vidéos dans videos_sources/.")
+    return source, debut
+
+
+def generer_video(source, debut, musique, calque, sortie, duree_clip):
     cmd = ["ffmpeg", "-y", "-loglevel", "error",
            "-ss", f"{debut:.2f}", "-t", str(duree_clip), "-i", source,
            "-i", calque]
@@ -176,7 +190,6 @@ def generer_video(source, musique, calque, sortie, duree_clip):
             "-c:v", "libx264", "-preset", "medium", "-crf", "20",
             "-pix_fmt", "yuv420p", "-movflags", "+faststart", sortie]
     subprocess.run(cmd, check=True)
-    return debut
 
 
 def main():
@@ -184,6 +197,7 @@ def main():
     racine_defaut = os.path.abspath(os.path.join(ici, "..", "..", "..", "..", "tiktok"))
     p = argparse.ArgumentParser()
     p.add_argument("messages")
+    p.add_argument("--compte", required=True, help="nom du compte TikTok (sous-dossier de sortie)")
     p.add_argument("--racine", default=racine_defaut)
     p.add_argument("--duree", type=float, default=10)
     args = p.parse_args()
@@ -202,7 +216,7 @@ def main():
         print("⚠ Aucune musique dans musique/ : vidéos générées sans son.")
 
     jour = datetime.date.today().isoformat()
-    dossier = os.path.join(args.racine, "a_publier", jour)
+    dossier = os.path.join(args.racine, "a_publier", jour, args.compte)
     os.makedirs(dossier, exist_ok=True)
     existantes = len(lister(dossier, EXT_VIDEO))
 
@@ -214,16 +228,17 @@ def main():
 
     with tempfile.TemporaryDirectory() as tmp:
         for n, video in enumerate(videos, start=existantes + 1):
-            source = random.choice(sources)
+            source, debut = choisir_passage(sources, historique, args.duree)
             musique = random.choice(musiques) if musiques else None
             calque = os.path.join(tmp, f"calque_{n}.png")
             rendre_calque(video["blocs"], calque)
             sortie = os.path.join(dossier, f"video_{n}.mp4")
-            debut = generer_video(source, musique, calque, sortie, args.duree)
+            generer_video(source, debut, musique, calque, sortie, args.duree)
             with open(os.path.join(dossier, f"video_{n}_legende.txt"), "w", encoding="utf-8") as f:
                 f.write(video.get("legende", "") + "\n")
             historique.append({
                 "date": jour,
+                "compte": args.compte,
                 "fichier": os.path.relpath(sortie, args.racine),
                 "source": os.path.basename(source),
                 "debut_source": round(debut, 2),
