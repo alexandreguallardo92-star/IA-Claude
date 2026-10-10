@@ -1,0 +1,7 @@
+# Médias TikTok : restent sur le PC
+tiktok/videos_sources/*
+tiktok/musique/*
+tiktok/a_publier/*
+!tiktok/*/.gitkeep
+__pycache__/
+tiktok/historique.json
