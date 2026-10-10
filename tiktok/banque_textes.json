@@ -1,0 +1,90 @@
+{
+  "accroches": [
+    "FÉLICITATIONS !",
+    "URGENT !",
+    "STOP !",
+    "LIS ÇA !",
+    "CE N'EST PAS UN HASARD",
+    "BONNE NOUVELLE !",
+    "C'EST TON JOUR !",
+    "ENFIN !",
+    "REGARDE BIEN",
+    "ATTENDS !"
+  ],
+  "messages": {
+    "argent": [
+      "Une grosse, très grosse somme d'argent est en train d'arriver vers toi",
+      "L'argent que tu attends depuis longtemps est enfin en route vers toi",
+      "Tes problèmes d'argent sont sur le point de s'arrêter",
+      "Une rentrée d'argent inattendue va te surprendre très bientôt",
+      "L'argent va couler vers toi comme une rivière",
+      "Tu vas bientôt recevoir de l'argent d'une source que tu n'attendais pas",
+      "Ton compte en banque va bientôt te faire sourire",
+      "Tu ne vas même pas réussir à tout compter tellement l'argent va arriver",
+      "Cette semaine, l'argent va enfin venir vers toi",
+      "Les dettes vont partir et l'abondance va prendre leur place"
+    ],
+    "univers": [
+      "L'univers a un message très important pour toi aujourd'hui",
+      "Tu vas bientôt recevoir le signe que tu attendais",
+      "D'ici ce soir, tu vas recevoir un message très positif",
+      "L'univers a entendu ta demande et la réponse arrive",
+      "Ce que tu as demandé à l'univers est déjà en chemin",
+      "Un signe va t'apparaître dans les prochaines heures",
+      "Les portes qui étaient fermées vont enfin s'ouvrir pour toi",
+      "L'univers prépare quelque chose de grand pour toi",
+      "Une très bonne nouvelle va changer ta semaine",
+      "Tout ce que tu as traversé va enfin être récompensé"
+    ],
+    "chance": [
+      "La chance a décidé de se tourner vers toi",
+      "Une période de chance incroyable commence pour toi",
+      "Tout ce que tu vas toucher va se transformer en réussite",
+      "La malchance est terminée, une nouvelle page commence",
+      "Les jours qui arrivent vont être les plus chanceux de ton année",
+      "Ta chance va tourner plus vite que tu ne le crois",
+      "Un coup de chance va tout changer pour toi",
+      "Les bonnes surprises vont s'enchaîner pour toi"
+    ],
+    "amour": [
+      "L'amour que tu mérites est en train d'arriver vers toi",
+      "Une personne va bientôt entrer dans ta vie et tout changer",
+      "Ton cœur va enfin être rempli de bonheur",
+      "Quelqu'un pense très fort à toi en ce moment",
+      "Une belle histoire d'amour se prépare pour toi"
+    ],
+    "sante": [
+      "Ton corps et ton esprit vont retrouver toute leur force",
+      "La paix et la sérénité vont enfin revenir dans ta vie",
+      "Une énergie nouvelle va remplir ta vie",
+      "La fatigue va laisser place à une énergie incroyable"
+    ],
+    "travail": [
+      "Une opportunité professionnelle va bientôt se présenter à toi",
+      "Ton travail va enfin être reconnu à sa juste valeur",
+      "Le projet qui te tient à cœur va réussir",
+      "Une porte va s'ouvrir dans ton travail très bientôt"
+    ],
+    "famille": [
+      "Ta famille va vivre de très beaux moments",
+      "La paix va revenir dans ta famille",
+      "Une très bonne nouvelle va arriver pour un de tes proches",
+      "Le bonheur va remplir ta maison"
+    ]
+  },
+  "peur_de_rater": [
+    "Mais si tu ignores ce message, tu passeras à côté",
+    "Ne laisse pas passer cette chance",
+    "Cette vidéo ne reviendra pas une deuxième fois",
+    "Si tu passes cette vidéo, tu laisses passer ta chance",
+    "Ce message n'apparaît qu'aux personnes choisies",
+    "Ne scrolle pas sans avoir fait ce geste"
+  ],
+  "appels": [
+    "Clique sur le + et commente \"{mot}\"",
+    "Abonne-toi et commente \"{mot}\" pour le recevoir",
+    "Il te suffit d'appuyer sur le + et de commenter \"{mot}\"",
+    "Appuie sur le + et écris \"{mot}\"",
+    "Abonne-toi et écris \"{mot}\" pour l'accueillir"
+  ]
+}

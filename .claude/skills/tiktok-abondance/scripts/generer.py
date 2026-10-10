@@ -1,24 +1,13 @@
-"""Génère les vidéos TikTok « abondance positive » du jour.
+"""Génère les vidéos TikTok « abondance positive » du jour, pour tous les comptes.
 
 Usage :
-    python generer.py messages.json [--racine DOSSIER] [--duree 10]
+    python generer.py [--racine DOSSIER] [--duree 10] [--compte NOM]
 
-messages.json : liste de vidéos, chacune avec ses blocs de texte et sa légende :
-    [
-      {
-        "blocs": [
-          {"texte": "FÉLICITATIONS !", "style": "titre_rouge"},
-          {"texte": "Une grosse somme d'argent arrive vers toi", "style": "corps_bleu"},
-          {"texte": "Clique sur le + et commente \"argent\"", "style": "appel_vert"}
-        ],
-        "legende": "abonne-toi pour recevoir l'abondance #abondance"
-      }
-    ]
-
-Pour chaque vidéo : un rush est pris au hasard dans videos_sources/, coupé à un
-moment au hasard, recadré en 1080x1920, les blocs de texte sont posés dessus et
-une musique de musique/ est ajoutée (départ au hasard, fondu entrée/sortie).
-Tout part dans a_publier/AAAA-MM-JJ/.
+Sans appel à Claude : les textes sont tirés de tiktok/banque_textes.json selon
+l'identité de chaque compte (tiktok/comptes.json), sans jamais répéter un texte
+déjà publié. Pour chaque vidéo, un rush de videos_sources/ est coupé à un moment
+jamais utilisé, recadré en 1080x1920, les blocs de texte sont posés dessus et une
+musique de musique/ est ajoutée. Sortie : a_publier/AAAA-MM-JJ/<compte>/.
 """
 
 import argparse
@@ -192,21 +181,47 @@ def generer_video(source, debut, musique, calque, sortie, duree_clip):
     subprocess.run(cmd, check=True)
 
 
+def ecrire_texte(compte, banque, deja_vus, messages_du_compte):
+    """Compose une vidéo à partir de la banque, sans répéter un texte déjà publié."""
+    messages = [m for t in compte["themes"] for m in banque["messages"].get(t, [])]
+    # Priorité aux messages que ce compte n'a pas encore utilisés.
+    neufs = [m for m in messages if m not in messages_du_compte] or messages
+    for _ in range(500):
+        blocs = [
+            {"texte": random.choice(banque["accroches"]), "style": random.choice(compte["styles_titre"])},
+            {"texte": random.choice(neufs), "style": random.choice(compte["styles_corps"])},
+        ]
+        if random.random() < 0.6:
+            blocs.append({"texte": random.choice(banque["peur_de_rater"]), "style": "alerte_rouge"})
+        appel = random.choice(banque["appels"]).format(mot=random.choice(compte["mots_a_commenter"]))
+        blocs.append({"texte": appel, "style": random.choice(compte["styles_appel"])})
+        cle = tuple(b["texte"] for b in blocs)
+        if cle not in deja_vus:
+            break
+    deja_vus.add(cle)
+    messages_du_compte.add(blocs[1]["texte"])
+    legende = compte["legende"] + " " + " ".join(random.sample(compte["hashtags"], min(5, len(compte["hashtags"]))))
+    return {"blocs": blocs, "legende": legende}
+
+
 def main():
     ici = os.path.dirname(os.path.abspath(__file__))
     racine_defaut = os.path.abspath(os.path.join(ici, "..", "..", "..", "..", "tiktok"))
     p = argparse.ArgumentParser()
-    p.add_argument("messages")
-    p.add_argument("--compte", required=True, help="nom du compte TikTok (sous-dossier de sortie)")
     p.add_argument("--racine", default=racine_defaut)
     p.add_argument("--duree", type=float, default=10)
+    p.add_argument("--compte", help="ne générer que pour ce compte")
     args = p.parse_args()
 
     if not shutil.which("ffmpeg"):
         sys.exit("ffmpeg introuvable : installe-le (winget install Gyan.FFmpeg) puis relance le terminal.")
 
-    with open(args.messages, encoding="utf-8") as f:
-        videos = json.load(f)
+    with open(os.path.join(args.racine, "comptes.json"), encoding="utf-8") as f:
+        comptes = json.load(f)
+    with open(os.path.join(args.racine, "banque_textes.json"), encoding="utf-8") as f:
+        banque = json.load(f)
+    if args.compte:
+        comptes = [c for c in comptes if c["nom"] == args.compte]
 
     sources = lister(os.path.join(args.racine, "videos_sources"), EXT_VIDEO)
     musiques = lister(os.path.join(args.racine, "musique"), EXT_AUDIO)
@@ -215,41 +230,47 @@ def main():
     if not musiques:
         print("⚠ Aucune musique dans musique/ : vidéos générées sans son.")
 
-    jour = datetime.date.today().isoformat()
-    dossier = os.path.join(args.racine, "a_publier", jour, args.compte)
-    os.makedirs(dossier, exist_ok=True)
-    existantes = len(lister(dossier, EXT_VIDEO))
-
     historique_chemin = os.path.join(args.racine, "historique.json")
     historique = []
     if os.path.exists(historique_chemin):
         with open(historique_chemin, encoding="utf-8") as f:
             historique = json.load(f)
+    deja_vus = {tuple(h["blocs"]) for h in historique}
 
+    jour = datetime.date.today().isoformat()
     with tempfile.TemporaryDirectory() as tmp:
-        for n, video in enumerate(videos, start=existantes + 1):
-            source, debut = choisir_passage(sources, historique, args.duree)
-            musique = random.choice(musiques) if musiques else None
-            calque = os.path.join(tmp, f"calque_{n}.png")
-            rendre_calque(video["blocs"], calque)
-            sortie = os.path.join(dossier, f"video_{n}.mp4")
-            generer_video(source, debut, musique, calque, sortie, args.duree)
-            with open(os.path.join(dossier, f"video_{n}_legende.txt"), "w", encoding="utf-8") as f:
-                f.write(video.get("legende", "") + "\n")
-            historique.append({
-                "date": jour,
-                "compte": args.compte,
-                "fichier": os.path.relpath(sortie, args.racine),
-                "source": os.path.basename(source),
-                "debut_source": round(debut, 2),
-                "musique": os.path.basename(musique) if musique else None,
-                "blocs": [b["texte"] for b in video["blocs"]],
-                "legende": video.get("legende", ""),
-            })
-            print(f"✔ {sortie}")
+        for compte in comptes:
+            dossier = os.path.join(args.racine, "a_publier", jour, compte["nom"])
+            os.makedirs(dossier, exist_ok=True)
+            existantes = len(lister(dossier, EXT_VIDEO))
+            messages_du_compte = {h["blocs"][1] for h in historique
+                                  if h.get("compte") == compte["nom"] and len(h["blocs"]) > 1}
+            for n in range(existantes + 1, compte["videos_par_jour"] + 1):
+                video = ecrire_texte(compte, banque, deja_vus, messages_du_compte)
+                source, debut = choisir_passage(sources, historique, args.duree)
+                musique = random.choice(musiques) if musiques else None
+                calque = os.path.join(tmp, f"calque_{compte['nom']}_{n}.png")
+                rendre_calque(video["blocs"], calque)
+                sortie = os.path.join(dossier, f"video_{n}.mp4")
+                generer_video(source, debut, musique, calque, sortie, args.duree)
+                with open(os.path.join(dossier, f"video_{n}_legende.txt"), "w", encoding="utf-8") as f:
+                    f.write(video["legende"] + "\n")
+                historique.append({
+                    "date": jour,
+                    "compte": compte["nom"],
+                    "fichier": os.path.relpath(sortie, args.racine),
+                    "source": os.path.basename(source),
+                    "debut_source": round(debut, 2),
+                    "musique": os.path.basename(musique) if musique else None,
+                    "blocs": [b["texte"] for b in video["blocs"]],
+                    "legende": video["legende"],
+                })
+                # Sauvegarde après chaque vidéo : rien n'est perdu si le PC s'éteint.
+                with open(historique_chemin, "w", encoding="utf-8") as f:
+                    json.dump(historique, f, ensure_ascii=False, indent=1)
+                print(f"OK {compte['nom']}/video_{n}.mp4")
 
-    with open(historique_chemin, "w", encoding="utf-8") as f:
-        json.dump(historique, f, ensure_ascii=False, indent=2)
+    print(f"Terminé : {os.path.join(args.racine, 'a_publier', jour)}")
 
 
 if __name__ == "__main__":
